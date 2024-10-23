@@ -20,7 +20,7 @@ podTemplate(containers: [
          stage ("Teste") {
              sh "docker run -tdi --rm --name simple-python-flask-${BUILD_ID} --rm simple-python-flask:${BUILD_ID}"
              sh "docker exec simple-python-flask-${BUILD_ID} nosetests --with-xunit --with-coverage --cover-package=project test_users.py"
-             sh "docker stop simlpe-python-flask-${BUILD_ID}"
+             sh "docker stop simple-python-flask-${BUILD_ID}"
              sh "docker tag simple-python-flask:${BUILD_ID} localhost:8082/simple-python-flask:${BUILD_ID}"
          }
 
