@@ -1,0 +1,20 @@
+image: docker:git
+services:
+    - docker:dind
+
+stages:
+  - test
+  - build
+  - deploy
+
+teste-app:
+  stage: test
+  # Imagem do dockerfile FROM
+  image: python:3.9.10-slim-bullseye
+  services:
+      - docker:dind
+  # Execução do Dockerfile RUN    
+  script:
+      - apt update && apt install -y python3-mysqldb libmariadb-dev gcc
+      - pip install -r requirements.txt
+      - nosetests --with-xunit --with-coverage --cover-package=project test_users.py
