@@ -18,3 +18,33 @@ teste-app:
       - apt update && apt install -y python3-mysqldb libmariadb-dev gcc
       - pip install -r requirements.txt
       - nosetests --with-xunit --with-coverage --cover-package=project test_users.py
+  #Armazenando arquivo XML gerado dos testes para verificação
+  artifacts:
+    #Sempre irá executar esse artifact
+    when: always
+    #O path de armazenamento
+    paths:
+      - nosetests.xml
+    #Rodando um Junit no teste
+    reports:
+      junit: nosetests.xml
+
+#Realizando o build da imagem
+build:
+  stage: build
+  dependencies:
+    - teste-app
+  services:
+      - docker:dind
+  script:
+      - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+      - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
+      - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+
+#Incluindo teste SAST (Static Application Security Test) na pipeline, a mesma utilziada no Jenkins, porém, jenkins utilizou o Sonarqube
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+
+spotbugs-sast:
+  variables:
+    FAIL_NEVER: 1
