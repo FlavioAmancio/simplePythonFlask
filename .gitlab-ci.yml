@@ -41,6 +41,26 @@ build:
       - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
       - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
 
+deploy_homolog:
+  stage: deploy
+  dependencies:
+    - build
+  image: alpine
+  script:
+      - apk update && apk add --no-cache curl
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      - chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
+      # Criando uma pasta para alocar a variável criada
+      - mkdir -p $HOME/.kube
+      # Salvando o conteúdo da variável em um arquivo dentro da pasta criada
+      - echo -n ${kubeconfig} | base64 -d > $HOME/.kube/config
+      - kubectl set image deployment/web simplepythonflask=${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} -n homolog
+      - kubectl get pods -n homolog
+  # Pipeline rodando no gilab e não na infra, como subimos um Runner, temos de apontar uma tag para ele.
+  # Temos um Step para fazer deploy, teoaricamente, após o Build
+  tags:
+      - cicd-runner
+
 #Incluindo teste SAST (Static Application Security Test) na pipeline, a mesma utilziada no Jenkins, porém, jenkins utilizou o Sonarqube
 include:
   - template: Jobs/SAST.gitlab-ci.yml
