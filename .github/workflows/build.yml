@@ -1,0 +1,49 @@
+# Irá realizar o build quando fizermos o merge para o master
+name: Container Image Build
+
+on:
+    push:
+      branches:
+        - master
+    schedule:
+        - cron: 0 1 * * *
+
+env:
+    # O registre do próprio github
+    REGISTRY: ghcr.io
+    # Meu repositório
+    IMAGE_NAME: ${{ github.repository}}
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      # Quais a permissões que terá, estaremos trabalhando com as mesmas permissões do github
+      permissions:
+        # Poderá ler os conteúdos
+        contents: read
+        # Poderá escrever nos próprios pacotes do github
+        packages: write
+      strategy:
+        fail-fast: false
+      
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v4
+        - name: login REGISTRY
+          uses: docker/login-actions
+          with:
+            registry: ${{ env.REGISTRY}}
+            username: ${{ github.actor}}
+            password: ${{ secrets.GITHUB_TOKEN}}
+        - name: Extrair Docker Metadata
+          id: meta
+          uses: docker/metadata-action@v5
+          with:
+            images: ${{ env.REGISTRY}}/${{env.IMAGE_NAME}}
+        - name: Build e Push
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            file: Dockerfile
+            push: true
+            tags: ${{ steps.meta.outputs.tags}}
