@@ -55,9 +55,11 @@ jobs:
         # Utilizando a action do checkout do github, vai clonar o repositório
         - uses: actions/checkout@v4
 
-        # Instalando as atualizações
-        - name: "Apt Get"
-          run: apt update && apt install -y python3-mysqldb libmariadb-dev gcc
+        # Instalando as dependências do sistema
+        - name: "Install system dependencies"
+          run: |
+            apt update
+            apt install -y pkg-config libmysqlclient-dev libmariadb-dev gcc
   
         # Instalando as dependências do pip que utilizamos
         - name: "Install pip deps"
