@@ -19,6 +19,6 @@ Werkzeug==1.0.1
 WTForms==2.3.3
 nose
 coverage
-selenium==4.21.0
+selenium==4.26.1
 Rust
 mysqlclient
