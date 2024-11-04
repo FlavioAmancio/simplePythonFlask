@@ -74,3 +74,21 @@ jobs:
           with:
             files: |
               *.xml
+  # Fazendo build da imagem utiliznado a sintaxe do GitHub
+  build-container:
+    # Rodando no Ubuntu
+    runs-on: ubuntu-latest
+    # Quais a permissões que terá, estaremos trabalhando com as mesmas permissões do github
+    permissions:
+      # Poderá ler os conteúdos
+      contents: read
+      # Poderá escrever nos próprios pacotes do github
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Build Container"
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME:${GITHUB_SHA}
+
+
+
+
