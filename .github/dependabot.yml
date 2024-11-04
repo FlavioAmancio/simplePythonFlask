@@ -1,0 +1,21 @@
+# Versão utilizada do Dependabot
+version: 2
+
+# O que desejo que ele faço
+updates:
+
+  # Utilizar o ecosistema de pacotes do Pip
+  - package-ecosystem: "pip"
+
+    # Estará rodando no / pois é onde está meu arquivo de requirements
+    directory: "/"
+
+    # Agendamento
+    schedule:
+
+      # Estará rodando em um intervalo diário
+      interval: "daily"
+
+    # Coloco aqui o prefixo que eu quero somente para identificação
+    commit-message:
+      prefix: "[dependencia]"
