@@ -1,0 +1,78 @@
+# Nome do nosso WorkFlow
+name: "CI/CD - Test"
+
+# Onde nosso teste será executado
+on:
+
+# Será executada a cada push que for realizado
+  push:
+
+  # Executando em todas as Branches
+    branches:
+      - '*'
+
+# Definindo variáveis
+env:
+  IMAGE_NAME: aula-cicd
+
+# Iniciando a definição do nossos Jobs
+jobs:
+
+# Primeiro Job de teste
+  test:
+    name: "Teste da Aplicação"
+
+    # Declarando onde nosso teste irá rodar, no github podemos rodar em máquinas Linux
+    runs-on: ubuntu-latest
+
+    # Alterando as permissões no repositório
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+
+    # Utilizando Matrix
+    strategy:
+      fail-fast: false
+      matrix:
+
+        # Aqui ele estará rodando em uma imagem
+        container:
+          - "docker.io/python:3.12.1-bullseye"
+          - "docker.io/python:3.11.9-bullseye"
+          - "docker.io/python:3.10.14-bullseye"
+   
+    # Aqui estamos criando 03 containers para testar em diferentes versões do Python
+    container:
+        image: ${{ matrix.container }}
+  
+     # Primeiro step fazendo Build da imagem do Docker
+    steps:
+  
+        # Atualizando PIP
+        - name: "Pip Upgrade"
+          run: pip install --upgrade pip
+  
+        # Utilizando a action do checkout do github, vai clonar o repositório
+        - uses: actions/checkout@v4
+
+        # Instalando as atualizações
+        - name: "Apt Get"
+          run: apt update && apt install -y python3-mysqldb libmariadb-dev gcc
+  
+        # Instalando as dependências do pip que utilizamos
+        - name: "Install pip deps"
+          run: pip install -r requirements.txt
+  
+        # Rodando teste unitário
+        - name: "Run Tests"
+          run: nosetests --with-xunit --with-coverage --cover-package=project test_users.py
+
+        # Armazenando as informações do meu teste
+        - name: "Publish Test Results"
+          uses: EnricoMi/publish-unit-test-result-action@v2
+          if: always()
+          with:
+            files: |
+              *.xml
