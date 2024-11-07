@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mariadb-data-pvc
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mariadb-data
+  name: mariadb-data
+  namespace: homolog
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi 
-  storageClassName: local-storage
+      storage: 100Mi
+status: {}

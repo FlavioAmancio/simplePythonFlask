@@ -2,7 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mariadb
   name: mariadb
+  namespace: homolog
 spec:
   replicas: 1
   selector:
@@ -35,5 +41,5 @@ spec:
       volumes:
         - name: mariadb-data
           persistentVolumeClaim:
-            claimName: mariadb-data-pvc
+            claimName: mariadb-data
 status: {}
