@@ -41,6 +41,7 @@ jobs:
           with:
             images: ${{ env.REGISTRY}}/${{ github.repository_owner }}/${{env.IMAGE_NAME}}
         - name: Build Image
-          run: docker build . --file Dockerfile --tag ${{ env.REGISTRY}}/${{ github.repository_owner }}/${{env.IMAGE_NAME}}
+          # run: docker build . --file Dockerfile --tag ${{ env.REGISTRY}}/${{ github.repository_owner }}/${{env.IMAGE_NAME}}
+          run: docker build . --file Dockerfile --tag "${{ env.REGISTRY }}/$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')/$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')"
         - name: Push Image
           run: docker push . --file Dockerfile --tag ${{ env.REGISTRY}}/${{ github.repository_owner }}/${{env.IMAGE_NAME}}
